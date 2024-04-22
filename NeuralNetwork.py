@@ -1,47 +1,31 @@
 import pandas as pd
-from keras.models import Sequential
-from keras.layers import Dense
-from sklearn.preprocessing import StandardScaler
+import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.metrics import confusion_matrix, accuracy_score
-from sklearn.preprocessing import LabelEncoder
 
-dataset = pd.read_csv('C:/Users/legos/Downloads/Dataset of Diabetes.csv')
+data = pd.read_csv('C:/Users/legos/Downloads/Dataset of Diabetes.csv')
+data.info()
 
-# Drop unnecessary columns
-X = dataset.drop(columns=['ID', 'No_Pation', 'CLASS'])
-Y = dataset['CLASS']
+# drop irrelevant columns
+dropcols = ['ID', 'No_Pation']
+data = data.drop(dropcols, axis=1)
+data.info()
 
-# One-hot encode categorical columns
-X = pd.get_dummies(X, columns=['Gender'])
+X = data.values
+Y = data['CLASS'].values
 
-# Splitting the dataset
+# create dummy variables
+dummies = []
+dummycols = ['Gender', 'CLASS']
+for dummycol in dummycols:
+    dummies.append(pd.get_dummies(data[dummycol]))
+
+diabetes_dummies = pd.concat(dummies, axis=1)
+
+# need to group F and f together
+data = pd.concat([data, diabetes_dummies], axis=1)
+data = data.drop(['Gender', 'CLASS'], axis=1)
+data.info()
+
+X = np.delete(X, 1, axis=1)
+
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=0)
-
-# Feature Scaling
-sc = StandardScaler()
-X_train = sc.fit_transform(X_train)
-X_test = sc.transform(X_test)
-
-label_encoder = LabelEncoder()
-Y_train_encoded = label_encoder.fit_transform(Y_train)
-
-label_encoder = LabelEncoder()
-Y_test_encoded = label_encoder.fit_transform(Y_test)
-
-# Model Building
-classifier = Sequential()
-classifier.add(Dense(units=6, activation='relu', input_dim=X_train.shape[1]))
-classifier.add(Dense(units=6, activation='relu'))
-classifier.add(Dense(units=1, activation='sigmoid'))
-classifier.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-classifier.fit(X_train, Y_train_encoded, epochs=999, batch_size=10)
-
-# Model Evaluation
-Y_pred = classifier.predict(X_test)
-Y_pred_binary = (Y_pred > 0.5)  # Apply threshold for binary prediction
-cm = confusion_matrix(Y_test_encoded, Y_pred_binary)
-acc = accuracy_score(Y_test_encoded, Y_pred_binary)
-print("Accuracy:", acc)
-print("Confusion Matrix:\n", cm)
