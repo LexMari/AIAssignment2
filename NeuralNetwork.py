@@ -18,25 +18,19 @@ dropcols = ['ID', 'No_Pation']
 data = data.drop(dropcols, axis=1)
 
 # Filter rows to only contain 'N', 'Y', and 'P' in 'CLASS' column
-filterclassdata = data[data['CLASS'].isin(['N', 'Y', 'P'])]
-
-# Filter 'Gender' column to only contain 'M' and 'F'
-filtered_dataset = filterclassdata[filterclassdata['Gender'].isin(['M', 'F'])]
-
-# Reset index
-filtered_dataset.reset_index(drop=True, inplace=True)
+data['CLASS'] = data['CLASS'].replace({'N ': 'N', 'Y ': 'Y'})
+data['Gender'] = data['Gender'].replace({'f': 'F'})
 
 # Encode 'CLASS' and 'Gender' columns
 label_encoder = preprocessing.LabelEncoder()
-filtered_dataset['CLASS'] = label_encoder.fit_transform(filtered_dataset['CLASS'])
-filtered_dataset['Gender'] = label_encoder.fit_transform(filtered_dataset['Gender'])
-filtered_dataset['CLASS'].unique()
-filtered_dataset['Gender'].unique()
+data['CLASS'] = label_encoder.fit_transform(data['CLASS'])
+data['Gender'] = label_encoder.fit_transform(data['Gender'])
+data['CLASS'].unique()
+data['Gender'].unique()
 
-
-X = filtered_dataset.values
-Y = filtered_dataset['CLASS'].values
-filtered_dataset.to_csv('Diabetes3.csv', index=False)
+X = data.values
+Y = data['CLASS'].values
+data.to_csv('Diabetes3Pls.csv', index=False)
 
 X = np.delete(X, 1, axis=1)
 
