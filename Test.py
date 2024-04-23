@@ -1,4 +1,3 @@
-
 from keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras import optimizers
@@ -11,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold, cross_val_score
 
 data = pd.read_csv('C:/Users/legos/Downloads/Dataset of Diabetes.csv',
-                  dtype=np.float32, delimiter=',')
+                   dtype=np.float32, delimiter=',')
 
 X = data.drop(columns=['ID', 'No_Pation'])
 Y = data['CLASS']  # Keep the CLASS column
@@ -29,19 +28,19 @@ model = Sequential([
 ])
 
 model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['accuracy'])
-model.fit(x, y, epochs=200, batch_size=32, verbose=2)
-print(model.evaluate(x, y))
+model.fit(x, Y, epochs=200, batch_size=32, verbose=2)
+print(model.evaluate(x, Y))
 
 print()
 
 
 def build_model():
-    model = Sequential()
-    model.add(Dense(units=64, input_dim=8, activation='relu'))
-    model.add(Dense(units=32, activation='relu'))
-    model.add(Dense(units=1, activation='sigmoid'))
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-    return model
+    datamodel = Sequential()
+    datamodel.add(Dense(units=64, input_dim=8, activation='relu'))
+    datamodel.add(Dense(units=32, activation='relu'))
+    datamodel.add(Dense(units=1, activation='sigmoid'))
+    datamodel.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+    return datamodel
 
 
 estimatorModel = Sequential(build_fn=build_model, epochs=200, batch_size=32, verbose=2)
