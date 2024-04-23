@@ -8,7 +8,7 @@ from keras import Sequential
 from keras.layers import Dense, BatchNormalization, Dropout
 from keras import regularizers
 from sklearn.metrics import confusion_matrix, accuracy_score
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 data = pd.read_csv('C:/Users/legos/Downloads/Dataset of Diabetes.csv')
 
@@ -32,10 +32,14 @@ Y = data['CLASS'].values
 X = data.drop(columns=['CLASS']).values
 # data.to_csv('Diabetes4hope.csv', index=False)
 
+encoder = OneHotEncoder(categories='auto', sparse_output=False)
+Y = encoder.fit_transform(Y.reshape(-1, 1))  # Reshape Y to make it 2D
+Y = Y[:, 1:]
+print(Y)
 # X = np.delete(X, 1, axis=1)
 
 # split to training and testing sets
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=12)
 
 
 X_train = tf.convert_to_tensor(X_train, dtype=tf.float32)
@@ -47,9 +51,9 @@ X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
 model = Sequential([
-    Dense(units=64, activation='relu', input_dim=X_train.shape[1]),
+    Dense(units=128, activation='relu', input_dim=X_train.shape[1]),
     Dropout(0.5),
-    Dense(units=32, activation='relu', kernel_regularizer=regularizers.l2(0.001)),
+    Dense(units=64, activation='relu', kernel_regularizer=regularizers.l2(0.01)),
     BatchNormalization(),
     Dense(units=1, activation='sigmoid')
 ])
@@ -63,7 +67,7 @@ model = Sequential([
 optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
 model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
 
-model.fit(X_train, Y_train, epochs=100, batch_size=32, verbose=1)
+# model.fit(X_train, Y_train, epochs=100, batch_size=32, verbose=1, validation_split=0.1)
 
 Y_pred = model.predict(X_test)
 Y_pred_int = (Y_pred > 0.5).astype(int)
