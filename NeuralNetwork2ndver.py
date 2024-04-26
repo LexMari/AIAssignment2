@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from keras.models import Sequential
+import matplotlib.pyplot as plt
 from keras.layers import Dense
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
@@ -33,14 +34,11 @@ sc = StandardScaler()
 X_train = sc.fit_transform(X_train)
 X_test = sc.transform(X_test)
 
-# Model architecture for binary classification
+
 classifier = Sequential()
 classifier.add(Dense(units=6, kernel_initializer='uniform', activation='relu', input_dim=11))
 classifier.add(Dense(units=6, kernel_initializer='uniform', activation='relu'))
-# Use 'sigmoid' for binary classification
 classifier.add(Dense(units=3, kernel_initializer='uniform', activation='softmax'))
-
-# Compile the model
 classifier.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Fit the model
@@ -49,9 +47,10 @@ classifier.fit(X_train, Y_train, batch_size=10, epochs=80)
 # Predict the test set results
 y_pred = classifier.predict(X_test)
 y_pred = (y_pred > 0.5)
-# cm = confusion_matrix(Y_test, y_pred)
+cm = confusion_matrix(Y_test.argmax(axis=1), y_pred.argmax(axis=1))
 accuracy = accuracy_score(Y_test, y_pred)
 
-# print("Confusion Matrix:\n", cm)
+print("Confusion Matrix:\n", cm)
 print("Accuracy:", accuracy)
+
 

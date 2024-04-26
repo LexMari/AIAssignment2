@@ -87,4 +87,4 @@ plt.legend()
 plt.show()
 
 print("Accuracy:", acc)
-print("Alice Matrix:\n", cm)
+print("Confusion Matrix:\n", cm)
